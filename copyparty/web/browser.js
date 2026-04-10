@@ -1216,9 +1216,7 @@ onresize100.add(read_sbw, true);
 
 
 function check_image_support(format, uri) {
-	var cached
-	    = window['have_' + format]
-	    = sread('have_' + format);
+	var cached = window['have_' + format] = sread('have_' + format);
 	if (cached !== null)
 		return;
 
@@ -5411,8 +5409,8 @@ var showfile = (function () {
 			Prism.highlightElement(el);
 		}
 		catch (ex) { }
-        btn.setAttribute('download', ebi('docname').innerHTML);
-        btn.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(jt));
+		btn.setAttribute('download', ebi('docname').innerHTML);
+		btn.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(jt));
 	};
 
 	r.mktree = function () {
@@ -5852,7 +5850,7 @@ var thegrid = (function () {
 				ihref = addq(ihref, 'th=' + (
 					have_jxl  ? 'x' :
 					have_webp ? 'w' :
-					            'j'
+					'j'
 				));
 				if (!r.crop)
 					ihref += 'f';
@@ -9713,7 +9711,7 @@ var rcm = (function () {
 			var row = mknod('tr', 'rcm_tmp',
 				'<td>-new-</td><td colspan="' + (QSA("#files thead th").length - 1) + '"><input id="tempname" class="i" type="text" placeholder="' + (is_dir ? 'Folder' : 'File') + ' Name"></td>');
 			QS("#files tbody").appendChild(row);
-	    }
+		}
 		else {
 			var row = mknod('a', 'rcm_tmp',
 				'<span class="dir" style="align-self:end"><input id="tempname" class="dir" type="text" placeholder="' + (is_dir ? 'Folder' : 'File') + ' Name"></span>');
