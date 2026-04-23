@@ -4133,8 +4133,11 @@ def _runhook(
             "src": src,
         }
         if txt:
-            ja["txt"] = txt[0]
-            ja["body"] = txt[1]
+            if src in ("xm", "xban"):
+                ja["txt"] = txt[0]
+                ja["body"] = txt[1]
+            else:
+                ja["wark"] = txt[0]  # acshually the dwark but less confusing
         if imp:
             ja["log"] = log
             mod = loadpy(acmd[0], False)
@@ -4247,7 +4250,7 @@ def runhook(
                 else:
                     ret[k] = v
         except Exception as ex:
-            (log or print)("hook: %r, %s" % (ex, ex))
+            (log or print)("hook failed; %s:\n%s" % (ex, min_ex()))
             if ",c," in "," + cmd:
                 return {"rc": 1}
             break
