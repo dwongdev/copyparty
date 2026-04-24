@@ -209,7 +209,20 @@ class SvcHub(object):
         else:
             self.log = self._log_enabled
 
+        self.lo1 = self.lo2 = ""
         if args.lo:
+            if "%" in args.lo and "%R" not in args.lo:
+                args.lo += "%R"
+            if not args.rlo:
+                args.lo = args.lo.replace("%R", "")
+            try:
+                self.lo1, self.lo2 = args.lo.split("%R")
+            except:
+                self.lo1 = args.lo
+            try:
+                self.rot_fmt = "%%s%s%%0%sd%s" % (args.rlo[:1], args.rlo[1:2], self.lo2)
+            except:
+                self.rot_fmt = "%s.%d"
             self._setup_logfile()
 
         LOG[0] = self.log
@@ -1360,7 +1373,7 @@ class SvcHub(object):
 
     def _logname(self) -> str:
         dt = datetime.now(self.tz)
-        fn = str(self.args.lo)
+        fn = str(self.lo1)
         for fs in "YmdHMS":
             fs = "%" + fs
             if fs in fn:
@@ -1369,15 +1382,17 @@ class SvcHub(object):
         return fn
 
     def _setup_logfile(self) -> None:
-        base_fn = fn = sel_fn = self._logname()
-        do_xz = fn.lower().endswith(".xz")
-        if fn != self.args.lo:
-            ctr = 0
+        base_fn = fn = self._logname()
+        sel_fn = fn + self.lo2
+        do_xz = sel_fn.lower().endswith(".xz")
+        if "%R" in self.args.lo:
             # yup this is a race; if started sufficiently concurrently, two
             # copyparties can grab the same logfile (considered and ignored)
-            while os.path.exists(sel_fn):
-                ctr += 1
-                sel_fn = "{}.{}".format(fn, ctr)
+            for n in range(9999):
+                if n or "!" in self.args.rlo:
+                    sel_fn = self.rot_fmt % (fn, n)
+                if not os.path.exists(sel_fn):
+                    break
 
         fn = sel_fn
         try:

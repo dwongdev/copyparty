@@ -1021,6 +1021,23 @@ def get_sects():
             ),
         ],
         [
+            "rlo",
+            "logrotate format",
+            dedent(
+                """
+            a logrotate-counter is added if the logfile filename is taken;
+            by default at the end, unless \033[32m%R\033[0m is somewhere in the \033[36m-lo\033[0m pattern,
+            for example:  -lo /var/log/cpp/%Y-%m-%d%R.txt
+
+            \033[36m--rlo\033[0m configures the logrotate format; examples:
+            .1   = when necessary, append a dot followed by a single digit
+            .1!  = counter is always added, even when not necessary
+            -3   = a hyphen followed by three-digit counter
+            (blank) = disable counter; overwrite existing logfile
+            """
+            ),
+        ],
+        [
             "ls",
             "volume inspection",
             dedent(
@@ -1681,6 +1698,7 @@ def add_logging(ap):
     ap2.add_argument("-q", action="store_true", help="quiet; disable most STDOUT messages")
     ap2.add_argument("-lo", metavar="PATH", type=u, default="", help="logfile; use .txt for plaintext or .xz for compressed. Example: \033[32mcpp-%%Y-%%m%%d-%%H%%M%%S.txt.xz\033[0m (NB: some errors may appear on STDOUT only)")
     ap2.add_argument("--flo", metavar="N", type=int, default=1, help="log format for \033[33m-lo\033[0m; [\033[32m1\033[0m]=classic/colors, [\033[32m2\033[0m]=no-color")
+    ap2.add_argument("--rlo", metavar="TXT", type=u, default=".1", help="logrotate counter format; see \033[33m--help-rlo\033[0m")
     ap2.add_argument("--no-ansi", action="store_true", default=not VT100, help="disable colors; same as environment-variable NO_COLOR")
     ap2.add_argument("--ansi", action="store_true", help="force colors; overrides environment-variable NO_COLOR")
     ap2.add_argument("--no-logflush", action="store_true", help="don't flush the logfile after each write; tiny bit faster")

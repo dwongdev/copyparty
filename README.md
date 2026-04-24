@@ -1360,6 +1360,7 @@ serverlog is sent to stdout by default  (but logging to a file is also possible)
 * [-q](https://copyparty.eu/cli/#g-q) disables logging to stdout, and may improve performance a little bit
   * combine it with `-lo logfolder/cpp-%Y-%m-%d.txt` to log to a file instead
   * the `%Y-%m-%d` makes it create a new logfile every day, with the date as filename
+  * global-option [--rlo](https://copyparty.eu/cli/#rlo-help-page) decides what happens if the filename is taken
 * `-lo whatever.txt` can be used without `-q` to log to both at the same time
   * by default, the logfile will have colors if the terminal does (usually the case)
   * use the [textfile-viewer](https://github.com/user-attachments/assets/8a828947-2fae-4df9-bd2a-3de46f42d478) or `less -R` in a terminal to see colors correctly
