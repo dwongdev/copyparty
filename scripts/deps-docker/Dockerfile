@@ -24,8 +24,9 @@ RUN     mkdir -p /z/dist/no-pk \
         && wget https://fonts.gstatic.com/s/sourcecodepro/v11/HI_SiYsKILxRpg3hIP6sJ7fM7PqlPevW.woff2 -O scp.woff2 \
         && apk add \
                 bash brotli cmake make g++ git gzip lame npm patch pigz \
-                python3 python3-dev py3-brotli sox tar unzip wget \
+                python3 python3-dev py3-pip py3-brotli sox tar unzip wget \
         && rm -f /usr/lib/python3*/EXTERNALLY-MANAGED \
+        && pip install strip_hints \
         && wget https://github.com/markedjs/marked/archive/v$ver_marked.tar.gz -O marked.tgz \
         && wget https://github.com/Ionaru/easy-markdown-editor/archive/$ver_mde.tar.gz -O mde.tgz \
         && wget https://github.com/codemirror/codemirror5/archive/$ver_codemirror.tar.gz -O codemirror.tgz \
@@ -34,7 +35,7 @@ RUN     mkdir -p /z/dist/no-pk \
         && wget https://github.com/google/zopfli/archive/zopfli-$ver_zopfli.tar.gz -O zopfli.tgz \
         && wget https://github.com/Daninet/hash-wasm/releases/download/v$ver_hashwasm/hash-wasm@$ver_hashwasm.zip -O hash-wasm.zip \
         && wget https://github.com/PrismJS/prism/archive/refs/tags/v$ver_prism.tar.gz -O prism.tgz \
-        && wget https://files.pythonhosted.org/packages/04/0b/4506cb2e831cea4b0214d3625430e921faaa05a7fb520458c75a2dbd2152/fusepy-3.0.1.tar.gz -O fusepy.tgz \
+        && wget https://files.pythonhosted.org/packages/91/47/746287c8962274f73ee25edb3840d80899464bfffbe2c435424c2d60a071/mfusepy-3.1.1.tar.gz -O mfusepy.tgz \
         && (mkdir hash-wasm \
             && cd hash-wasm \
             && unzip ../hash-wasm.zip) \
@@ -51,7 +52,7 @@ RUN     mkdir -p /z/dist/no-pk \
             && npm i gulp-cli -g ) \
         && tar --no-same-owner -xf dompurify.tgz \
         && tar --no-same-owner -xf prism.tgz \
-        && tar --no-same-owner -xf fusepy.tgz \
+        && tar --no-same-owner -xf mfusepy.tgz \
         && unzip fontawesome.zip \
         && tar --no-same-owner -xf zopfli.tgz
 
@@ -148,16 +149,22 @@ RUN     cd /z/dist \
         && rmdir no-pk
 
 
-# build fusepy
-COPY    uncomment.py /z
-RUN     mv /z/fusepy-3.0.1/fuse.py /z/dist/f1 \
+# build mfusepy -- just sizegolfing for the sfx, mfusepy.py works fine as-is
+COPY    uncomment.py unhint.py /z
+RUN     mv /z/mfusepy-3.1.1/mfusepy.py /z/dist/ \
         && cd /z/dist \
+        && python3 /z/unhint.py \
+        && mv mfusepy.py f1 \
         && python3 /z/uncomment.py f1 \
-        && sed -ri '/self.__critical_exception = e/d' f1 \
-        && awk '/^log =/{s=0} !s; /^from traceback im/{s=1;print"from functools import partial";print"basestring = str"}' <f1 >f2 \
-        && awk '/LoggingMixIn:/{exit} --s<0;/self.use_ns = getattr/{s=7}' <f2 >f1 \
-        && awk "/if _machine =/{s=0} /'(mips|ppc|ppc64)'/{s=1} !s" <f1 >f2 \
-        && rm f1 && mv f2 fuse.py
+        && sed -ri '/self.__critical_exception/d; /^from (typing|collections.abc) import/d' f1 \
+        && sed -ri '/^(FieldsEntry|BitFieldsEntry|ReadDirResult) =/d' f1 \
+        && awk "/if TYPE_CHECKING:/{s=1;sub(/TYPE_CHECKING/,"1");print}!s;/else:/{s=0}" <f1 >f2 \
+        && awk '/^def _nullable_dummy_function/{print"class Operations:\n    pass";exit};1' <f2 >f1 \
+        && awk '/^# Note that/{s=3} --s<0; /self.use_ns = getattr/{s=16}' <f1 >f2 \
+        && awk "/if _machine =/{s=0} /_machine == '(mips|ppc|ppc64)'/{s=1} !s" <f2 >f1 \
+        && awk '/else:/{s=0} /elif _system == .NetBSD/{s=1} !s' <f1 >f2 \
+        && awk '/^if _system == .NetBSD_False/{s=1;print"if 0:\n    pass"} /^elif/{s=0} !s' <f2 >f1 \
+        && rm f2 && mv f1 mfusepy.py
 
 
 # git diff -U2 --no-index marked-1.1.0-orig/ marked-1.1.0-edit/ -U2 | sed -r '/^index /d;s`^(diff --git a/)[^/]+/(.* b/)[^/]+/`\1\2`; s`^(---|\+\+\+) ([ab]/)[^/]+/`\1 \2`' > ../dev/copyparty/scripts/deps-docker/marked-ln.patch
