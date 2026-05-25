@@ -1770,7 +1770,7 @@ avoid traversing into other filesystems  using `--xdev` / volflag `:c,xdev`, ski
 
 and/or you can `--xvol` / `:c,xvol` to ignore all symlinks leaving the volume's top directory, but still allow bind-mounts pointing elsewhere
 
-* symlinks are permitted with `xvol` if they point into another volume where the user has the same level of access
+* symlinks are permitted with `xvol` if they point into another volume where the user also has some sort of access, keeping permissions from outer/initial volume
 
 these options will reduce performance; unlikely worst-case estimates are 14% reduction for directory listings, 35% for download-as-tar
 
