@@ -137,6 +137,7 @@ def vf_vmap() -> dict[str, str]:
         "put_ck",
         "put_name",
         "readmes",
+        "rotf_tz",
         "mv_retry",
         "rm_retry",
         "rss_sort",

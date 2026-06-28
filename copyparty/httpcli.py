@@ -5390,11 +5390,9 @@ class HttpCli(object):
             "lastmod": int(ts_md * 1000),
             "lang": self.cookies.get("cplng") or self.args.lang,
             "favico": self.args.favico,
-            "have_emp": int(self.args.emp),
-            "md_no_br": int(vn.flags.get("md_no_br") or 0),
-            "md_chk_rate": self.args.mcr,
             "md": boundary,
             "arg_base": arg_base,
+            "cgv1": self.vn.md_htm,
         }
 
         if self.args.js_other and "js" not in targs:

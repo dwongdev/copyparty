@@ -443,6 +443,7 @@ class VFS(object):
         self.adot: dict[str, list[str]] = {}
         self.js_ls = {}
         self.js_htm = ""
+        self.md_htm = ""
         self.all_vols: dict[str, VFS] = {}  # flattened recursive
         self.all_nodes: dict[str, VFS] = {}  # also jumpvols/shares
         self.all_fvols: dict[str, VFS] = {}  # volumes which are files
@@ -3193,7 +3194,7 @@ class AuthSrv(object):
             db.close()
 
         self.js_ls = {}
-        self.js_htm = {}
+        self.js_htm = ""
         for vp, vn in self.vfs.all_nodes.items():
             if enshare and vp.startswith(shrs):
                 continue  # propagates later in this func
@@ -3285,7 +3286,13 @@ class AuthSrv(object):
                 zs2 = getattr(self.args, zs, "")
                 if zs2:
                     js_htm[zs] = zs2
+
+            zs = "have_emp md_no_br"
+            md_htm = {x:js_htm[x] for x in zs.split(" ")}
+            md_htm["modpoll_freq"] = self.args.mcr
+
             vn.js_htm = json_hesc(json.dumps(js_htm))
+            vn.md_htm = json_hesc(json.dumps(md_htm))
 
         vols = list(vfs.all_nodes.values())
         if enshare:

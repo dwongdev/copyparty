@@ -134,15 +134,9 @@ write markdown (most html is 🙆 too)
 	<script>
 
 var SR = "{{ r }}",
+	CGV1 = {{ cgv1 }},
 	last_modified = {{ lastmod }},
-	have_emp = {{ have_emp }},
-	md_no_br = {{ md_no_br }},
 	dfavico = "{{ favico }}";
-
-var md_opt = {
-	link_md_as_html: false,
-	modpoll_freq: {{ md_chk_rate }}
-};
 
 (function () {
 	var l = window.localStorage,
